@@ -33,7 +33,13 @@ public:
 	static std::vector<std::string> getVars(CNode* node, std::vector<std::string> *accumulator) ; // return expression used to create the tree
 
 };
-
+/*
+Implementing error checking in the expression:
+If the tree is constructed (no null children left) but there are elements left, omit leftovers and print a message:
+	check if currentIndex is at the end of vector after tree construction
+If the tree is not constructed (null children left) but there are no elements left, fill null children with default value (1) and print a message
+	while taking value from vector, check if currentIndex is at the end of vector, if it is take value 1 instead and print a message
+*/
 
 class CTree 
 {
