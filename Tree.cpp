@@ -6,6 +6,16 @@
 CTree::CTree(const std::vector<std::string> expression) 
 {
 	root = new CNode(expression, NULL);
+	// if position is not at the end of vector, print notification and ommit leftovers
+	if (CNode::getCurrentPosition() < expression.size())
+	{
+		interface::printSpace(notification_ommitingLeftovers);
+		for (int i = CNode::getCurrentPosition(); i < expression.size(); i++)
+		{
+			interface::printSpace(expression[i]);
+		}
+		interface::print(""); // newline
+	} 
 }
 
 void CTree::printExpression() const
@@ -133,6 +143,7 @@ std::vector<std::string> CNode::getVars(CNode* node, std::vector<std::string>* a
 	getVars(node->right, accumulator);
 	return *accumulator;
 }
+
 
 void CNode::deleteTree(CNode* node) 
 {

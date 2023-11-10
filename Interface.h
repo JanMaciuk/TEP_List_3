@@ -24,6 +24,8 @@ const string notification_noTree = "No tree found, use enter command to create a
 const string notification_printingTree = "Printing tree: ";
 const string notification_printingExpression = "Constructed a tree using the expression: ";
 const string notification_printingVars = "Printing variables: ";
+const string notification_ommitingLeftovers = "Ommiting invalid values at the end of expression which couldnt be attached:";
+
 
 namespace interface 
 {

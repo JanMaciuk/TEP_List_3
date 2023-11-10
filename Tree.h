@@ -31,7 +31,7 @@ public:
 	static void inOrderWalk(CNode* node); //Print expression used to create the tree
 	static void deleteTree(CNode* node); // delete all children and itself
 	static std::vector<std::string> getVars(CNode* node, std::vector<std::string> *accumulator) ; // return expression used to create the tree
-
+	inline static int getCurrentPosition() { return currentIndex; }; // return value of currentIndex 
 };
 /*
 Implementing error checking in the expression:
