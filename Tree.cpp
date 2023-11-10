@@ -24,16 +24,19 @@ void CTree::printExpression() const
 	interface::print(""); // newline
 }
 
-void CTree::printVars() const
+std::vector<std::string> CTree::getVars() const
 {
 	std::vector<std::string> accumulator;
 	std::vector<std::string> vars = CNode::getVars(root, &accumulator);
-	interface::print(notification_printingVars);
-	for (int i = 0; i < vars.size(); i++)
-	{
-		interface::printSpace(vars[i]);
-	}
-	interface::print(""); // newline
+	return vars;
+
+}
+
+double CTree::calculate(std::vector<double> values) const
+{
+	std::vector<std::string> accumulator;
+	std::vector<std::string> vars = CNode::getVars(root, &accumulator);
+	return CNode::calculate(root, vars, values);
 }
 
 CTree::~CTree() { CNode::deleteTree(root); }
@@ -43,7 +46,9 @@ CTree::~CTree() { CNode::deleteTree(root); }
 CNode::CNode(const std::vector<std::string> expression, CNode* parentNode)
 {
 	parent = parentNode;
-	string val = expression[currentIndex];
+	string val = defaultNodeValue;
+	if (currentIndex < expression.size()) { val = expression[currentIndex]; } // if there are values left in the vector, get the next one
+	else { interface::print(parentNode->value + notification_missingValue + defaultNodeValue); } // if there are no values left, notify user and use default value
 	currentIndex++;
 	type = getType(&val); // get type of the value, if its a variable, turn it into a valid variable name
 	value = val;
@@ -80,7 +85,21 @@ int CNode::getType( std::string *value)
 	// 1 - operation with 1 child, 2 - operation with 2 children, 3 - constant, 4 - variable (name is made valid)
 	if (std::find(operations1child.begin(), operations1child.end(), *value) != operations1child.end()) { return 1; } // if value is in the list of operations with 1 child
 	else if (std::find(operations2children.begin(), operations2children.end(), *value) != operations2children.end()) { return 2; } // if value is in the list of operators with 2 children
-	else if (isNumber(*value)) { return 3; } // if value is a number/constant
+	else if (isNumber(*value)) // if value is a number/constant return 3
+	{ 
+		//ensure the number is not zero
+		bool isZero = false;
+		for (int i = 0; i < value->length(); i++)
+		{
+			if ((*value)[i] == minDigit) { isZero = true; }
+		}
+		if (isZero)
+		{
+			interface::print(notification_zeroNotAllowed + defaultNodeValue);
+			*value = defaultNodeValue;
+		}
+		return 3; 
+	} 
 	else // if value is a variable validate it
 	{ 
 		*value = validateVariableName(*value);
@@ -142,6 +161,43 @@ std::vector<std::string> CNode::getVars(CNode* node, std::vector<std::string>* a
 	getVars(node->left, accumulator);
 	getVars(node->right, accumulator);
 	return *accumulator;
+}
+
+
+double CNode::calculate(CNode* node, std::vector<std::string> vars, std::vector<double> values)
+{
+	if (node == NULL) { return 0; }
+
+	else if (node->type == 3)  // if its a constant, simply return its value
+	{
+		return (node->value[0] - minDigit);
+	}
+
+	else if (node->type == 4) // if its a variable, find its value in values vector
+	{
+		int index = std::find(vars.begin(), vars.end(), node->value) - vars.begin(); // variable must be in the vars vector, so index will be valid (length is checked before)
+		return values[index];
+	}
+
+	else if (node->type == 2) // if its a normal operator, calculate the values
+	{
+		double leftResult = calculate(node->left, vars, values);
+		double rightResult = calculate(node->right, vars, values);
+
+		if (node->value == operations2children[0]) { return leftResult + rightResult; }
+		else if (node->value == operations2children[1]) { return leftResult - rightResult; }
+		else if (node->value == operations2children[multiplicationIndex]) { return leftResult * rightResult; }
+		else if (node->value == operations2children[divisionIndex]) { return double(leftResult) / double(rightResult); }
+	}
+	
+	else if (node->type == 1)
+	{
+		double childResult = calculate(node->left, vars, values);
+		if (node->value == operations1child[0]) { return sin(childResult); }
+		if (node->value == operations1child[1]) { return cos(childResult); }
+	}
+
+	return 0;
 }
 
 

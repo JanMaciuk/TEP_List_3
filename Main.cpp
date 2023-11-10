@@ -14,4 +14,10 @@ int main()
 	}
     return 0;
 }
+/*
+TODO:
+finish error checking,
+operator+ and operator= for CTree class,
+join two trees using operators,
 
+*/

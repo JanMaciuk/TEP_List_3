@@ -3,6 +3,8 @@
 #include <vector>
 
 const std::vector<std::string> operations2children = { "+", "-", "*", "/"};
+const int multiplicationIndex = 2;
+const int divisionIndex = 3;
 const std::vector<std::string> operations1child = { "sin", "cos"};
 const char minDigit = '0';
 const char maxDigit = '9';
@@ -10,6 +12,8 @@ const char minSmalLetter = 'a';
 const char maxSmallLetter = 'z';
 const char minCapitalLetter = 'A';
 const char maxCapitalLetter = 'Z';
+const std::string defaultNodeValue = "1";
+
 
 class CNode 
 {
@@ -32,13 +36,17 @@ public:
 	static void deleteTree(CNode* node); // delete all children and itself
 	static std::vector<std::string> getVars(CNode* node, std::vector<std::string> *accumulator) ; // return expression used to create the tree
 	inline static int getCurrentPosition() { return currentIndex; }; // return value of currentIndex 
+	static double calculate(CNode* node, std::vector<std::string> vars, std::vector<double> values); // calculate expression using variables and values
 };
+
 /*
 Implementing error checking in the expression:
 If the tree is constructed (no null children left) but there are elements left, omit leftovers and print a message:
 	check if currentIndex is at the end of vector after tree construction
 If the tree is not constructed (null children left) but there are no elements left, fill null children with default value (1) and print a message
-	while taking value from vector, check if currentIndex is at the end of vector, if it is take value 1 instead and print a message
+	while taking value from vector, check if currentIndex is at the end of vector, if it is take defaultValue instead and print a message
+
+If division by zero attempt is made, print a message and replace the value with 1
 */
 
 class CTree 
@@ -56,8 +64,8 @@ public:
 	//CTree operator+(const CTree& otherInstance) const; //Return copy, result of adding another tree to current tree
 
 	void printExpression() const; //Print expression used to create the tree
-	void printVars() const; //Print all variables used in the expression
-	
+	std::vector<std::string> getVars() const; //Print all variables used in the expression
+	double calculate(std::vector<double> values) const; //Calculate expression using variable values
 
 	~CTree(); //Destructor
 };

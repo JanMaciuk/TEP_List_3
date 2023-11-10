@@ -25,12 +25,17 @@ const string notification_printingTree = "Printing tree: ";
 const string notification_printingExpression = "Constructed a tree using the expression: ";
 const string notification_printingVars = "Printing variables: ";
 const string notification_ommitingLeftovers = "Ommiting invalid values at the end of expression which couldnt be attached:";
+const string notification_missingValue = " operator should be followed by a value, adding default: ";
+const string notification_invalidVariablesNumber = "Wrong amount of variable values found";
+const string notification_invalidVariableValue = " is not a valid value for a variable, a positive number required ";
+const string notification_zeroNotAllowed = "entered numbers must be positive, zero is not supported, replacing with default value: ";
 
 
 namespace interface 
 {
 	vector<string> getUserInput(); // Get user input from console and split it into vector of strings
 	inline void print(const string& message) { cout << message << endl; }; // Print to console
+	inline void print(const double& message) { cout << message << endl; }; // Print to console
 	inline void printSpace(const string& message) { cout << message << " "; }; // Print to console
 	vector<string> splitBySpace(const string& input); // Split string into a vector
 	bool handleCommand(const vector<string>& command, CTree** tree); // Call methods based on user command, false if exit

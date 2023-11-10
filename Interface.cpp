@@ -33,12 +33,14 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 	//wrong command should print to console and continue
 	string commandName = command[0];
 	// cannot use switch in a nice way beacause dealing with string type (enum is C++11)
+
 	if (commandName == command_exit || commandName == command_quit)  // end the program
 	{ 
 		interface::print(notification_exit); 
 		if (*tree != NULL) { delete *tree; }
 		return false; 
 	}
+
 	else if (commandName == command_enterTree) 
 	{ 
 		if (*tree != NULL) 
@@ -50,12 +52,24 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 		(*tree)->printExpression();
 		return true; 
 	}
+
 	else if (commandName == command_listVars)  
 	{ 
 		if (*tree == NULL) { interface::print(notification_noTree); }
-		else { (*tree)->printVars(); }
+		else 
+		{ 
+			vector<string> vars = (*tree)->getVars();
+			interface::print(notification_printingVars);
+			for (int i = 0; i < vars.size(); i++)
+			{
+				interface::printSpace(vars[i]);
+			}
+			interface::print(""); // newline
+
+		}
 		return true; 
 	}
+
 	else if (commandName == command_printTree) 
 	{ 
 		if (*tree == NULL) { interface::print(notification_noTree); }
@@ -66,8 +80,23 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 		}
 		return true; 
 	} 
-	else if (commandName == command_calculate) { return true; } //TODO: implement 
-	else if (commandName == command_addTree)   { return true; } //TODO: implement
+
+	else if (commandName == command_calculate) 
+	{ 
+		if (*tree == NULL) { interface::print(notification_noTree); return true; }
+		std::vector<double> values;
+		for (int i = 1; i < command.size(); i++) 
+		{
+			double value = std::atof(command[i].c_str()); // convert string to double using atof (c++98 standard)
+			if (value > 0.0) { values.push_back(value); } // only add valid positive doubles
+			else { interface::print(command[i] + notification_invalidVariableValue); return true; }
+		}
+		if (values.size() != (*tree)->getVars().size()) { interface::print(notification_invalidVariablesNumber); return true; }
+		interface:print((*tree)->calculate(values));
+		return true; 
+	}
+
+	else if (commandName == command_addTree) { return true; } //TODO: implement
 	else { interface::print(notification_wrongCommand); return true; }
 	
 }
