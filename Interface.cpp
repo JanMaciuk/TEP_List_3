@@ -55,7 +55,7 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 
 	else if (commandName == command_listVars)  
 	{ 
-		if (*tree == NULL) { interface::print(notification_noTree); }
+		if ((!treeIsInitialized(tree))) { interface::print(notification_noTree); }
 		else 
 		{ 
 			vector<string> vars = (*tree)->getVars();
@@ -72,7 +72,7 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 
 	else if (commandName == command_printTree) 
 	{ 
-		if (*tree == NULL) { interface::print(notification_noTree); }
+		if ((!treeIsInitialized(tree))) { interface::print(notification_noTree); }
 		else 
 		{ 
 			interface::print(notification_printingTree);
@@ -83,7 +83,7 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 
 	else if (commandName == command_calculate) 
 	{ 
-		if (*tree == NULL) { interface::print(notification_noTree); return true; }
+		if (!treeIsInitialized(tree)) { interface::print(notification_noTree); return true; }
 		std::vector<double> values;
 		for (int i = 1; i < command.size(); i++) 
 		{
@@ -92,11 +92,31 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 			else { interface::print(command[i] + notification_invalidVariableValue); return true; }
 		}
 		if (values.size() != (*tree)->getVars().size()) { interface::print(notification_invalidVariablesNumber); return true; }
-		interface:print((*tree)->calculate(values));
+		interface::print((*tree)->calculate(values));
 		return true; 
 	}
 
-	else if (commandName == command_addTree) { return true; } //TODO: implement
+	else if (commandName == command_addTree) 
+	{ 
+		if (!treeIsInitialized(tree)) { interface::print(notification_noTree); return true; }
+		(**tree) = (**tree) + CTree(command);
+		return true; 
+	}
+
+	else if (commandName == "test")  //TODO: remove
+	{
+		vector<string> expression = (*tree)->getExpression();
+		for (int i = 0; i < expression.size(); i++)
+		{
+			interface::printSpace(expression[i]);
+		}
+	}
 	else { interface::print(notification_wrongCommand); return true; }
 	
+}
+
+bool interface::treeIsInitialized(CTree** tree)
+{
+	if (*tree == NULL || !(*tree)->isInitialized()) { return false; }
+	else { return true; }
 }

@@ -16,18 +16,34 @@ CTree::CTree(const std::vector<std::string> expression)
 		}
 		interface::print(""); // newline
 	} 
+	CNode::resetCurrentPosition();
 }
+
+CTree::CTree(const CTree& otherInstance) // copy constructor
+{
+	std::vector<std::string> expression = otherInstance.getExpression();
+	expression.insert(expression.begin(), command_enterTree);
+	root = new CNode(expression, NULL);
+	// No need to check for leftovers, original tree must be valid
+	CNode::resetCurrentPosition();
+}
+
+CTree::CTree() // default constructor
+{
+	root = NULL;
+}
+
 
 void CTree::printExpression() const
 {
-	CNode::inOrderWalk(root);
+	root->inOrderWalkPrint();
 	interface::print(""); // newline
 }
 
 std::vector<std::string> CTree::getVars() const
 {
 	std::vector<std::string> accumulator;
-	std::vector<std::string> vars = CNode::getVars(root, &accumulator);
+	std::vector<std::string> vars = root->getVars(&accumulator);
 	return vars;
 
 }
@@ -35,14 +51,64 @@ std::vector<std::string> CTree::getVars() const
 double CTree::calculate(std::vector<double> values) const
 {
 	std::vector<std::string> accumulator;
-	std::vector<std::string> vars = CNode::getVars(root, &accumulator);
+	std::vector<std::string> vars = root->getVars(&accumulator);
 	return CNode::calculate(root, vars, values);
 }
 
-CTree::~CTree() { CNode::deleteTree(root); }
+std::vector<std::string> CTree::getExpression() const
+{
+	std::vector<std::string> accumulator;
+	std::vector<std::string> expression = root->inOrderWalk(&accumulator);
+	return expression;
+}
+
+void CTree::operator=(const CTree& otherInstance)
+{
+	// set current tree to a copy of another tree
+	// if current tree is not empty, delete it
+	if (this->root != NULL) { this->root->deleteTree(); }
+	// create a new tree with the same expression as the other tree
+	std::vector<std::string> expression = otherInstance.getExpression();
+	expression.insert(expression.begin(), command_enterTree);
+	this->root = new CNode(expression, NULL);
+	CNode::resetCurrentPosition();
+}
+
+CTree CTree::operator+(const CTree& otherInstance) const
+{
+	// join two trees using operator+
+	// if both trees are empty, return empty tree
+	if (this->root == NULL && otherInstance.root == NULL) { return CTree(); }
+	// if one of the trees is empty, return the other tree
+	else if (this->root == NULL) { return otherInstance; }
+	else if (otherInstance.root == NULL) { return *this; }
+	// if both trees are not empty, create a new tree with the root being the sum of the roots of the two trees
+	else
+	{ 
+		// get expressions of both trees
+		// remove last element from the first expression (it is a leaf)
+		// add the second expression to the first one
+		// create a new tree from the new expression
+		std::vector<std::string> thisExpression = this->getExpression(); // add first placeholder to expression
+		std::vector<std::string> otherExpression = otherInstance.getExpression();
+		thisExpression.pop_back();
+		thisExpression.insert(thisExpression.begin(), command_enterTree);
+		for (int i = 0; i < otherExpression.size(); i++)
+		{
+			thisExpression.push_back(otherExpression[i]);
+		}
+		CTree resultTree = CTree(thisExpression);
+		CNode::resetCurrentPosition();
+		return resultTree;
+		
+	}
+}
+
+CTree::~CTree() { root->deleteTree(); }
+
+
 
 //CNode::
-
 CNode::CNode(const std::vector<std::string> expression, CNode* parentNode)
 {
 	parent = parentNode;
@@ -71,13 +137,22 @@ CNode::CNode(const std::vector<std::string> expression, CNode* parentNode)
 
 }
 
-void CNode::inOrderWalk(CNode* node)
+void CNode::inOrderWalkPrint() const
 {
-	if (node == NULL) { return; }
-	interface::printSpace(node->value);
-	inOrderWalk(node->left);
-	inOrderWalk(node->right);
+	if (this == NULL) { return; }
+	interface::printSpace(value);
+	left->inOrderWalkPrint();
+	right->inOrderWalkPrint();
 
+}
+
+std::vector<std::string> CNode::inOrderWalk(std::vector<std::string>* accumulator) const
+{
+	if (this == NULL) { return *accumulator; }
+	accumulator->push_back(value);
+	left->inOrderWalk(accumulator);
+	right->inOrderWalk(accumulator);
+	return *accumulator;
 }
 
 int CNode::getType( std::string *value)
@@ -151,20 +226,20 @@ std::string CNode::validateVariableName(const std::string value)
 	return result;
 }
 
-std::vector<std::string> CNode::getVars(CNode* node, std::vector<std::string>* accumulator)
+std::vector<std::string> CNode::getVars(std::vector<std::string>* accumulator) const
 {
-	if (node == NULL) { return *accumulator; }
-	if ((node->type == 4) && (std::find((*accumulator).begin(), (*accumulator).end(), (node->value)) == (*accumulator).end()))
+	if (this == NULL) { return *accumulator; }
+	if ((this->type == 4) && (std::find((*accumulator).begin(), (*accumulator).end(), (this->value)) == (*accumulator).end()))
 	{ // if node is a variable and is not in the accumulator, add it
-		accumulator->push_back(node->value);
+		accumulator->push_back(this->value);
 	} // then walk throught the rest of the tree
-	getVars(node->left, accumulator);
-	getVars(node->right, accumulator);
+	left->getVars(accumulator);
+	right->getVars(accumulator);
 	return *accumulator;
 }
 
 
-double CNode::calculate(CNode* node, std::vector<std::string> vars, std::vector<double> values)
+double CNode::calculate(CNode* node, const std::vector<std::string> vars, const std::vector<double> values)
 {
 	if (node == NULL) { return 0; }
 
@@ -201,13 +276,12 @@ double CNode::calculate(CNode* node, std::vector<std::string> vars, std::vector<
 }
 
 
-void CNode::deleteTree(CNode* node) 
-{
-	if (node == NULL) { return; }
-	if (node->parent == NULL) { currentIndex = 1; }
-	deleteTree(node->left);
-	deleteTree(node->right);
-	delete node;
 
+void CNode::deleteTree() // delete the called node and all its descendants
+{
+	if (this == NULL) { return; }
+	left->deleteTree();
+	right->deleteTree();
+	delete this;
 }
 

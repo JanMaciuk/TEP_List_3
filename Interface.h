@@ -39,5 +39,5 @@ namespace interface
 	inline void printSpace(const string& message) { cout << message << " "; }; // Print to console
 	vector<string> splitBySpace(const string& input); // Split string into a vector
 	bool handleCommand(const vector<string>& command, CTree** tree); // Call methods based on user command, false if exit
-
+	bool treeIsInitialized(CTree** tree); // Check if tree is initialized
 }

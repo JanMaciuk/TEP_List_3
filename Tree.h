@@ -24,19 +24,21 @@ private:
 	std::string value;	  // operation or constant or variable
 	int type;			  // 1 - operation with 1 child, 2 - operation with 2 children, 3 - constant, 4 - variable
 	static int currentIndex;
-	static int getType(std::string *value); // return type of a string (operation, constant or variable), if its a variable, turns it into a valid variable name
-	static bool isNumber(const std::string value); // return true if string is a number
-	static std::string validateVariableName(const std::string value); // turn string into a valid variable name
+	static int getType(std::string *value);			// return type of a string (operation, constant or variable), if its a variable, turns it into a valid variable name
+	static bool isNumber(const std::string value);  // return true if string is a number
+	static std::string validateVariableName(const std::string value);  // turn string into a valid variable name
 	
 
 public:
 	//CNode(); //Default constructor
-	CNode(const std::vector<std::string> expression, CNode* parent); //Constructor from a string at index (calls next constructor)
-	static void inOrderWalk(CNode* node); //Print expression used to create the tree
-	static void deleteTree(CNode* node); // delete all children and itself
-	static std::vector<std::string> getVars(CNode* node, std::vector<std::string> *accumulator) ; // return expression used to create the tree
-	inline static int getCurrentPosition() { return currentIndex; }; // return value of currentIndex 
-	static double calculate(CNode* node, std::vector<std::string> vars, std::vector<double> values); // calculate expression using variables and values
+	CNode(const std::vector<std::string> expression, CNode* parent);					//Constructor from a string at index (calls next constructor)
+	std::vector<std::string> inOrderWalk(std::vector<std::string> *accumulator) const;  // return expression used to create the tree
+	std::vector<std::string> getVars(std::vector<std::string> *accumulator) const ;		// return expression used to create the tree
+	inline static int getCurrentPosition() { return currentIndex; };					// return value of currentIndex 
+	inline static void resetCurrentPosition() { currentIndex = 1; };					// set currentIndex to 1
+	static double calculate(CNode* node, const std::vector<std::string> vars, const std::vector<double> values); // calculate expression using variables and values
+	void inOrderWalkPrint() const;  //Print expression used to create the tree 
+	void deleteTree();				// delete all children and itself
 };
 
 /*
@@ -46,7 +48,7 @@ If the tree is constructed (no null children left) but there are elements left, 
 If the tree is not constructed (null children left) but there are no elements left, fill null children with default value (1) and print a message
 	while taking value from vector, check if currentIndex is at the end of vector, if it is take defaultValue instead and print a message
 
-If division by zero attempt is made, print a message and replace the value with 1
+Zeros are not allowed, so division by zero is impossible
 */
 
 class CTree 
@@ -56,16 +58,18 @@ private:
 	CNode* root;
 	
 public:
-	//CTree(); //Default constructor
-	//CTree(const CTree& otherInstance); //Copy constructor
-	CTree(const std::vector<std::string> expression); //Constructor from a vector of strings 
+	CTree();													//Default constructor - empty tree
+	CTree(const CTree& otherInstance);							//Copy constructor
+	CTree(const std::vector<std::string> expression);			//Constructor from a vector of strings 
 
-	//CTree operator=(const CTree& otherInstance); //Set current tree to a copy of another tree
-	//CTree operator+(const CTree& otherInstance) const; //Return copy, result of adding another tree to current tree
+	void operator=(const CTree& otherInstance);				//Set current tree to a copy of another tree
+	CTree operator+(const CTree& otherInstance) const;			//Return copy, result of adding another tree to current tree
 
-	void printExpression() const; //Print expression used to create the tree
-	std::vector<std::string> getVars() const; //Print all variables used in the expression
-	double calculate(std::vector<double> values) const; //Calculate expression using variable values
+	void printExpression() const;								//Print expression used to create the tree
+	std::vector<std::string> getExpression() const;				//Return expression used to create the tree
+	std::vector<std::string> getVars() const;					//Print all variables used in the expression
+	double calculate(std::vector<double> values) const;			//Calculate expression using variable values
+	inline bool isInitialized() const { return root != NULL; }; //Check if tree is initialized
 
 	~CTree(); //Destructor
 };
