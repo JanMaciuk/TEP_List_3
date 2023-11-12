@@ -13,6 +13,7 @@ const string command_printTree = "print";
 const string command_calculate = "comp";
 const string command_addTree = "join";
 const string defaultVarName = "x";
+const char char_space = ' ';
 
 const string notification_wrongCommand = "Wrong command, try again";
 const string notification_exit = "Terminating the program";

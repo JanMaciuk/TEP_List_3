@@ -14,7 +14,7 @@ vector<string> interface::splitBySpace(const string& input) {
 	string currentWord;
 	for (int i = 0; i < input.length(); i++) 
 	{
-		if (input[i] == ' ') // if current char is a space, add currentWord to result and reset currentWord
+		if (input[i] == char_space) // if current char is a space, add currentWord to result and reset currentWord
 		{ 
 			if (currentWord != "") { result.push_back(currentWord); } //Skip multiple spaces
 			currentWord = "";
@@ -100,17 +100,11 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 	{ 
 		if (!treeIsInitialized(tree)) { interface::print(notification_noTree); return true; }
 		(**tree) = (**tree) + CTree(command);
+		interface::print(notification_printingExpression);
+		(*tree)->printExpression();
 		return true; 
 	}
 
-	else if (commandName == "test")  //TODO: remove
-	{
-		vector<string> expression = (*tree)->getExpression();
-		for (int i = 0; i < expression.size(); i++)
-		{
-			interface::printSpace(expression[i]);
-		}
-	}
 	else { interface::print(notification_wrongCommand); return true; }
 	
 }
