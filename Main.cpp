@@ -11,6 +11,7 @@ int main()
     {
 		vector<string> command = interface::getUserInput();
 		running = interface::handleCommand(command, &tree);
+        
 	}
     
     return 0;

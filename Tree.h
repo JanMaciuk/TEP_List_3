@@ -13,12 +13,15 @@ const char maxSmallLetter = 'z';
 const char minCapitalLetter = 'A';
 const char maxCapitalLetter = 'Z';
 const std::string defaultNodeValue = "1";
+const int baseNumber = 10;
+const int maxChildrenCount = 3;
 
 
 class CNode 
 {
 
 private:
+	std::vector<CNode*> children; // vector with children
 	CNode* left, * right; // left and right children
 	CNode *parent;		  // parent of root is NULL
 	std::string value;	  // operation or constant or variable
@@ -26,8 +29,8 @@ private:
 	static int currentIndex;
 	static int getType(std::string *value);			// return type of a string (operation, constant or variable), if its a variable, turns it into a valid variable name
 	static bool isNumber(const std::string value);  // return true if string is a number
-	static std::string validateVariableName(const std::string value);  // turn string into a valid variable name
-	
+	static std::string validateVariableName(const std::string value);	// turn string into a valid variable name
+	static int strToInt(const std::string value, bool *overflow);		// convert string to int
 
 public:
 	//CNode(); //Default constructor

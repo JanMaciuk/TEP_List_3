@@ -30,6 +30,7 @@ const string notification_missingValue = " operator should be followed by a valu
 const string notification_invalidVariablesNumber = "Wrong amount of variable values found";
 const string notification_invalidVariableValue = " is not a valid value for a variable, a positive number required ";
 const string notification_zeroNotAllowed = "entered numbers must be positive, zero is not supported, replacing with default value: ";
+const string notification_overflow = "Integer overflow occured, use smaller values and consider result invalid, replaced by default: ";
 
 
 namespace interface 
