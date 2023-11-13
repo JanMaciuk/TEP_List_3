@@ -14,7 +14,7 @@ CTree::CTree(const std::vector<std::string> expression)
 		{
 			interface::printSpace(expression[i]);
 		}
-		interface::print(""); // newline
+		interface::print(emptyString); // newline
 	} 
 	CNode::resetCurrentPosition();
 }
@@ -37,7 +37,7 @@ CTree::CTree() // default constructor
 void CTree::printExpression() const
 {
 	root->inOrderWalkPrint();
-	interface::print(""); // newline
+	interface::print(emptyString); // newline
 }
 
 std::vector<std::string> CTree::getVars() const
@@ -82,17 +82,17 @@ CTree CTree::operator+(const CTree& otherInstance) const
 	// if one of the trees is empty, return the other tree
 	else if (this->root == NULL) { return otherInstance; }
 	else if (otherInstance.root == NULL) { return *this; }
-	// if both trees are not empty, create a new tree with the root being the sum of the roots of the two trees
+	// if both trees are not empty, create a new tree which is a copy of the first with second one added to it.
 	else
 	{ 
 		// get expressions of both trees
 		// remove last element from the first expression (it is a leaf)
 		// add the second expression to the first one
 		// create a new tree from the new expression
-		std::vector<std::string> thisExpression = this->getExpression(); // add first placeholder to expression
+		std::vector<std::string> thisExpression = this->getExpression(); 
 		std::vector<std::string> otherExpression = otherInstance.getExpression();
 		thisExpression.pop_back();
-		thisExpression.insert(thisExpression.begin(), command_enterTree);
+		thisExpression.insert(thisExpression.begin(), command_enterTree); // add first placeholder to expression
 		for (int i = 0; i < otherExpression.size(); i++)
 		{
 			thisExpression.push_back(otherExpression[i]);
@@ -205,7 +205,7 @@ std::string CNode::validateVariableName(const std::string value)
 	// cannot contain only numbers
 	// can only contain letters and numbers
 	
-	std::string result = "";
+	std::string result = emptyString;
 	for (int i = 0; i < value.length(); i++)
 	{
 		if ((value[i] >= minDigit && value[i] <= maxDigit) || (value[i] >= minSmalLetter && value[i] <= maxSmallLetter) || (value[i] >= minCapitalLetter && value[i] <= maxCapitalLetter))
@@ -217,7 +217,7 @@ std::string CNode::validateVariableName(const std::string value)
 			interface::print(value[i] + notification_ommitingInvalidChar);
 		}
 	}
-	if (result == "") // if variable name is empty, add default name to make it valid
+	if (result == emptyString) // if variable name is empty, add default name to make it valid
 	{ 
 		interface::print(notification_emptyVariableName + defaultVarName);
 		result = defaultVarName; 

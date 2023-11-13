@@ -13,6 +13,7 @@ const char maxSmallLetter = 'z';
 const char minCapitalLetter = 'A';
 const char maxCapitalLetter = 'Z';
 const std::string defaultNodeValue = "1";
+const std::string emptyString = "";
 const int baseNumber = 10;
 const int maxChildrenCount = 3;
 
@@ -65,7 +66,7 @@ public:
 	CTree(const CTree& otherInstance);							//Copy constructor
 	CTree(const std::vector<std::string> expression);			//Constructor from a vector of strings 
 
-	void operator=(const CTree& otherInstance);				//Set current tree to a copy of another tree
+	void operator=(const CTree& otherInstance);					//Set current tree to a copy of another tree
 	CTree operator+(const CTree& otherInstance) const;			//Return copy, result of adding another tree to current tree
 
 	void printExpression() const;								//Print expression used to create the tree
