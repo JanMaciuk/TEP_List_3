@@ -48,9 +48,9 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 			delete *tree; 
 		}
 		*tree = new CTree(command);
+		interface::print((*tree)->clearErrors());
 		interface::print(notification_printingExpression);
 		(*tree)->printExpression();
-		interface::print((*tree)->clearErrors());
 		return true; 
 	}
 
@@ -101,10 +101,10 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 	else if (commandName == command_addTree) 
 	{ 
 		if (!treeIsInitialized(tree)) { interface::print(notification_noTree); return true; }
-		(**tree) = (**tree) + CTree(command); //TODO: merge error lists on addition
+		(**tree) = (**tree) + CTree(command);
+		interface::print((*tree)->clearErrors());
 		interface::print(notification_printingExpression);
 		(*tree)->printExpression();
-		interface::print((*tree)->clearErrors());
 		return true; 
 	}
 

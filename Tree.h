@@ -51,15 +51,6 @@ public:
 	static std::string getErrors(bool clear);	// return all error messages and clear them if flag is set
 };
 
-/*
-Implementing error checking in the expression:
-If the tree is constructed (no null children left) but there are elements left, omit leftovers and print a message:
-	check if currentIndex is at the end of vector after tree construction
-If the tree is not constructed (null children left) but there are no elements left, fill null children with default value (1) and print a message
-	while taking value from vector, check if currentIndex is at the end of vector, if it is take defaultValue instead and print a message
-
-Zeros are not allowed, so division by zero is impossible
-*/
 
 class CTree 
 {
