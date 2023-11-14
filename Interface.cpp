@@ -50,6 +50,7 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 		*tree = new CTree(command);
 		interface::print(notification_printingExpression);
 		(*tree)->printExpression();
+		interface::print((*tree)->clearErrors());
 		return true; 
 	}
 
@@ -93,15 +94,17 @@ bool interface::handleCommand(const vector<string>& command, CTree** tree)
 		}
 		if (values.size() != (*tree)->getVars().size()) { interface::print(notification_invalidVariablesNumber); return true; }
 		interface::print((*tree)->calculate(values));
+		interface::print((*tree)->clearErrors());
 		return true; 
 	}
 
 	else if (commandName == command_addTree) 
 	{ 
 		if (!treeIsInitialized(tree)) { interface::print(notification_noTree); return true; }
-		(**tree) = (**tree) + CTree(command);
+		(**tree) = (**tree) + CTree(command); //TODO: merge error lists on addition
 		interface::print(notification_printingExpression);
 		(*tree)->printExpression();
+		interface::print((*tree)->clearErrors());
 		return true; 
 	}
 

@@ -9,12 +9,12 @@ CTree::CTree(const std::vector<std::string> expression)
 	// if position is not at the end of vector, print notification and ommit leftovers
 	if (CNode::getCurrentPosition() < expression.size())
 	{
-		interface::printSpace(notification_ommitingLeftovers);
+		root->logErrorSpace(notification_ommitingLeftovers);
 		for (int i = CNode::getCurrentPosition(); i < expression.size(); i++)
 		{
-			interface::printSpace(expression[i]);
+			root->logErrorSpace(expression[i]);
 		}
-		interface::print(emptyString); // newline
+		root->logError(emptyString); // newline
 	} 
 	CNode::resetCurrentPosition();
 }
@@ -61,6 +61,14 @@ std::vector<std::string> CTree::getExpression() const
 	std::vector<std::string> expression = root->inOrderWalk(&accumulator);
 	return expression;
 }
+
+std::string CTree::getErrors() const {
+	return root->getErrors(false);
+}
+std::string CTree::clearErrors() {
+	return root->getErrors(true);
+}
+
 
 void CTree::operator=(const CTree& otherInstance)
 {
@@ -116,8 +124,8 @@ CNode::CNode(const std::vector<std::string> expression, CNode* parentNode)
 	if (currentIndex < expression.size()) { val = expression[currentIndex]; } // if there are values left in the vector, get the next one
 	else 
 	{ // if there are no values left, notify user and use default value
-		if (parentNode == NULL) { interface::print(notification_missingValue + defaultNodeValue); }
-		else { interface::print(parentNode->value + notification_missingValue + defaultNodeValue); }
+		if (parentNode == NULL) { logError(notification_missingValue + defaultNodeValue); }
+		else { logError(parentNode->value + notification_missingValue + defaultNodeValue); }
 	} 
 	currentIndex++;
 	type = getType(&val); // get type of the value, if its a variable, turn it into a valid variable name
@@ -159,6 +167,21 @@ std::vector<std::string> CNode::inOrderWalk(std::vector<std::string>* accumulato
 	return *accumulator;
 }
 
+void CNode::logError(const std::string message)
+{
+	errMsg += message + endLine;
+}
+void CNode::logErrorSpace(const std::string message)
+{
+	errMsg += message + space;
+}
+std::string CNode::getErrors(bool clear)
+{
+	std::string result = errMsg;
+	if (clear) errMsg = emptyString;
+	return result;
+}
+
 int CNode::getType( std::string *value)
 {
 	// 1 - operation with 1 child, 2 - operation with 2 children, 3 - constant, 4 - variable (name is made valid)
@@ -174,7 +197,7 @@ int CNode::getType( std::string *value)
 		}
 		if (isZero)
 		{
-			interface::print(notification_zeroNotAllowed + defaultNodeValue);
+			logError(notification_zeroNotAllowed + defaultNodeValue);
 			*value = defaultNodeValue;
 		}
 		return 3; 
@@ -198,6 +221,7 @@ bool CNode::isNumber(const std::string value)
 }
 
 int CNode::currentIndex = 1;
+std::string CNode::errMsg = emptyString;
 std::string CNode::validateVariableName(const std::string value)
 {
 	// turn string into a valid variable name, requirements to be valid:
@@ -214,17 +238,17 @@ std::string CNode::validateVariableName(const std::string value)
 		}
 		else // if character is not a letter or a number, print notification and ommit it
 		{
-			interface::print(value[i] + notification_ommitingInvalidChar);
+			logError(value[i] + notification_ommitingInvalidChar);
 		}
 	}
 	if (result == emptyString) // if variable name is empty, add default name to make it valid
 	{ 
-		interface::print(notification_emptyVariableName + defaultVarName);
+		logError(notification_emptyVariableName + defaultVarName);
 		result = defaultVarName; 
 	}
 	if (isNumber(result)) // if variable name is only numbers, add default name to the beginning to make it valid
 	{ 
-		interface::print(notification_varNameOnlyNumbers);
+		logError(notification_varNameOnlyNumbers);
 		result = defaultVarName + result; 
 	} 
 	return result;
@@ -254,7 +278,7 @@ double CNode::calculate(CNode* node, const std::vector<std::string> vars, const 
 		if (overflow) 
 		{ 
 			value = strToInt(defaultNodeValue, &overflow); 
-			interface::print(notification_overflow + defaultNodeValue);
+			logError(notification_overflow + defaultNodeValue);
 		}
 		return value;
 	}
@@ -274,7 +298,7 @@ double CNode::calculate(CNode* node, const std::vector<std::string> vars, const 
 		{ 
 			if ((leftResult + rightResult) < 0) // Checking for overflow
 			{
-				interface::print(notification_overflow + defaultNodeValue);
+				logError(notification_overflow + defaultNodeValue);
 				bool overflow;
 				return strToInt(defaultNodeValue, &overflow);
 			}
@@ -285,7 +309,7 @@ double CNode::calculate(CNode* node, const std::vector<std::string> vars, const 
 		{ 
 			if ((leftResult * rightResult) < 0) // Checking for overflow
 			{
-				interface::print(notification_overflow + defaultNodeValue);
+				logError(notification_overflow + defaultNodeValue);
 				bool overflow;
 				return strToInt(defaultNodeValue, &overflow);
 			}

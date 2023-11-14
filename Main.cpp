@@ -16,9 +16,3 @@ int main()
     
     return 0;
 }
-/*
-TODO:
-finish error checking,
-use tree instead of *tree in main
-
-*/
