@@ -350,8 +350,10 @@ int CNode::strToInt(const std::string value, bool* overflow)
 void CNode::deleteTree() // delete the called node and all its descendants
 {
 	if (this == NULL) { return; }
-	children[0]->deleteTree();
-	children[1]->deleteTree();
+	for (int i = 0; i < maxChildrenCount; i++)
+	{
+		children[i]->deleteTree();
+	}
 	delete this;
 }
 
