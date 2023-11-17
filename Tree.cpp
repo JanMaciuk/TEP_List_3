@@ -5,27 +5,27 @@
 //CTree:
 CTree::CTree(const std::vector<std::string> expression) 
 {
-	root = new CNode(expression, NULL);
+	int index = 1;
+	root = new CNode(expression, NULL,&index);
 	// if position is not at the end of vector, print notification and ommit leftovers
-	if (CNode::getCurrentPosition() < expression.size())
+	if (index < expression.size())
 	{
 		root->logErrorSpace(notification_ommitingLeftovers);
-		for (int i = CNode::getCurrentPosition(); i < expression.size(); i++)
+		for (int i = index; i < expression.size(); i++)
 		{
 			root->logErrorSpace(expression[i]);
 		}
 		root->logError(emptyString); // newline
 	} 
-	CNode::resetCurrentPosition();
 }
 
 CTree::CTree(const CTree& otherInstance) // copy constructor
 {
 	std::vector<std::string> expression = otherInstance.getExpression();
 	expression.insert(expression.begin(), command_enterTree);
-	root = new CNode(expression, NULL);
+	int index = 1;
+	root = new CNode(expression, NULL, &index);
 	// No need to check for leftovers, original tree must be valid
-	CNode::resetCurrentPosition();
 }
 
 CTree::CTree() // default constructor
@@ -78,8 +78,8 @@ void CTree::operator=(const CTree& otherInstance)
 	// create a new tree with the same expression as the other tree
 	std::vector<std::string> expression = otherInstance.getExpression();
 	expression.insert(expression.begin(), command_enterTree);
-	this->root = new CNode(expression, NULL);
-	CNode::resetCurrentPosition();
+	int index = 1;
+	this->root = new CNode(expression, NULL,&index);
 }
 
 CTree CTree::operator+(const CTree& otherInstance) const
@@ -106,7 +106,6 @@ CTree CTree::operator+(const CTree& otherInstance) const
 			thisExpression.push_back(otherExpression[i]);
 		}
 		CTree resultTree = CTree(thisExpression);
-		CNode::resetCurrentPosition();
 		return resultTree;
 		
 	}
@@ -117,17 +116,17 @@ CTree::~CTree() { root->deleteTree(); }
 
 
 //CNode::
-CNode::CNode(const std::vector<std::string> expression, CNode* parentNode)
+CNode::CNode(const std::vector<std::string> expression, CNode* parentNode, int* currentIndex)
 {
 	parent = parentNode;
 	string val = defaultNodeValue;
-	if (currentIndex < expression.size()) { val = expression[currentIndex]; } // if there are values left in the vector, get the next one
+	if (*currentIndex < expression.size()) { val = expression[*currentIndex]; } // if there are values left in the vector, get the next one
 	else 
 	{ // if there are no values left, notify user and use default value
 		if (parentNode == NULL) { logError(notification_missingValue + defaultNodeValue); }
 		else { logError(parentNode->value + notification_missingValue + defaultNodeValue); }
 	} 
-	currentIndex++;
+	(*currentIndex)++;
 	type = getType(&val); // get type of the value, if its a variable, turn it into a valid variable name
 	value = val;
 	//fill vector with NULL children to avoid accessing unalocated memory by [] operator
@@ -137,13 +136,13 @@ CNode::CNode(const std::vector<std::string> expression, CNode* parentNode)
 	}
 	if (type == 1) // if operation with 1 child, create left child only
 	{
-		children[0] = new CNode(expression, this);
+		children[0] = new CNode(expression, this,currentIndex);
 		children[1] = NULL;
 	}
 	else if (type == 2) // if operation with 2 children, create left and right children 
 	{
-		children[0] = new CNode(expression, this);
-		children[1] = new CNode(expression, this);
+		children[0] = new CNode(expression, this,currentIndex);
+		children[1] = new CNode(expression, this,currentIndex);
 	}
 
 
@@ -220,7 +219,6 @@ bool CNode::isNumber(const std::string value)
 	return true;
 }
 
-int CNode::currentIndex = 1;
 std::string CNode::errMsg = emptyString;
 std::string CNode::validateVariableName(const std::string value)
 {
