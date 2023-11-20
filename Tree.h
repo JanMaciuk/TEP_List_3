@@ -3,9 +3,11 @@
 #include <vector>
 
 const std::vector<std::string> operations2children = { "+", "-", "*", "/"};
+const std::vector<std::string> operations1child = { "sin", "cos" };
 const int multiplicationIndex = 2;
 const int divisionIndex = 3;
-const std::vector<std::string> operations1child = { "sin", "cos"};
+const int IDconstant = 3;
+const int IDvariable = 4;
 const char minDigit = '0';
 const char maxDigit = '9';
 const char minSmalLetter = 'a';
@@ -17,7 +19,7 @@ const std::string emptyString = "";
 const std::string endLine = "\n";
 const std::string space = " ";
 const int baseNumber = 10;
-const int maxChildrenCount = 3;
+const int maxChildrenCount = 2;
 
 
 class CNode 

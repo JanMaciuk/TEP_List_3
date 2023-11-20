@@ -199,12 +199,12 @@ int CNode::getType( std::string *value)
 			logError(notification_zeroNotAllowed + defaultNodeValue);
 			*value = defaultNodeValue;
 		}
-		return 3; 
+		return IDconstant; 
 	} 
 	else // if value is a variable validate it
 	{ 
 		*value = validateVariableName(*value);
-		return 4; 
+		return IDvariable; 
 	
 	} 
 
@@ -255,7 +255,7 @@ std::string CNode::validateVariableName(const std::string value)
 std::vector<std::string> CNode::getVars(std::vector<std::string>* accumulator) const
 {
 	if (this == NULL) { return *accumulator; }
-	if ((this->type == 4) && (std::find((*accumulator).begin(), (*accumulator).end(), (this->value)) == (*accumulator).end()))
+	if ((this->type == IDvariable) && (std::find((*accumulator).begin(), (*accumulator).end(), (this->value)) == (*accumulator).end()))
 	{ // if node is a variable and is not in the accumulator, add it
 		accumulator->push_back(this->value);
 	} // then walk throught the rest of the tree
@@ -269,7 +269,7 @@ double CNode::calculate(CNode* node, const std::vector<std::string> vars, const 
 {
 	if (node == NULL) { return 0; }
 
-	else if (node->type == 3)  // if its a constant, simply return its value
+	else if (node->type == IDconstant)  // if its a constant, simply return its value
 	{
 		bool overflow;
 		int value = strToInt(node->value, &overflow);
@@ -281,7 +281,7 @@ double CNode::calculate(CNode* node, const std::vector<std::string> vars, const 
 		return value;
 	}
 
-	else if (node->type == 4) // if its a variable, find its value in values vector
+	else if (node->type == IDvariable) // if its a variable, find its value in values vector
 	{
 		int index = std::find(vars.begin(), vars.end(), node->value) - vars.begin(); // variable must be in the vars vector, so index will be valid (length is checked before)
 		return values[index];
